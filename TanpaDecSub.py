@@ -8,7 +8,7 @@ def on_connect(client, userdata, flags, rc, properties=None):
     print("CONNACK received with code %s." % rc)
 
 def pencatatan(msg, timeSend):
-	now = str(datetime.now().microsecond)
+	now = str(datetime.now().timestamp())
 	f = open('Subscriber.csv', 'a')
 	f.write(msg + ";" + now + ";" + timeSend + "\n")
 
