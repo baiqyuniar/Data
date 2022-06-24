@@ -1,18 +1,22 @@
 from collections import deque
-from datetime import datetime
+import datetime
 import json
 import time
 import paho.mqtt.client as paho
 from paho import mqtt
 
 def on_connect(client, userdata, flags, rc, properties=None):
-  
-    if rc == 0:
-        print("Connected to broker")
-        global Connected                #Use global variable
-        Connected = True                #Signal connection 
-    else:
-        print("Connection failed")
+    print("CONNACK received with code %s." % rc)
+
+def on_subscribe(client, userdata, mid, granted_qos, properties=None):
+    print("Subscribed: " + str(mid) + " " + str(granted_qos))
+
+client = paho.Client(client_id="clientId-7GWFTtedw0", userdata=None, protocol=paho.MQTTv5)
+client.username_pw_set("dw41y6", "rtX67vv09")
+client.connect("broker.mqttdashboard.com", 1883)
+
+client.on_connect = on_connect
+client.on_subscribe = on_subscribe
 
 class SimonCipher(object):
     """Simon Block Cipher Object"""
@@ -224,42 +228,23 @@ class SimonCipher(object):
 
 def pencatatan(msg, dateSend):
 	now = str(datetime.now().microsecond)
-	f = open('Subscriber.csv', 'a')
-	f.write(msg + ";" + now + ";" + dateSend + "\n")  
+	f = open('subscribe_Simon.csv', 'a')
+	f.write(msg + ";" + now + ";" + dateSend + "\n")
 
-key = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
-cipher = SimonCipher(key, 256, 128, 'CBC', 0xf925)
-def on_message(client, userdata, message):
-    raw = json.loads(message.payload.decode("utf-8"))
-    msg = int(raw['cipher'])
-    dateSend = raw['datetime']
-    pencatatan(str(msg), dateSend)
-    dec = cipher.decrypt(msg)
-    print("Decrypted\t: ", dec)
-  
-Connected = False   #global variable for the state of the connection
-  
-broker_address= "broker.mqttdashboard.com"  #Broker address
-port = 1883                        #Broker port
-user = "dw41y6"                    #Connection username
-password = "rtX67vv09"            #Connection password
-  
-client = paho.Client("clientId-7GWFTtedw0", userdata=None, protocol=paho.MQTTv5)              #create new instance
-client.username_pw_set("dw41y6", "rtX67vv09")    #set username and password
-client.connect(broker_address, port=port)
-client.on_connect= on_connect                      #attach function to callback
-client.on_message= on_message                      #attach function to 
+if __name__ == "__main__":
+    key = 0x1f1e1d1c1b1a19181716151413121110
+    cipher = SimonCipher(key, 128, 128, 'ECB')
+    # print message, useful for checking if it was successful
+    def on_message(client, userdata, message):
+        raw = json.loads(message.payload.decode("utf-8"))
+        msg = raw['cipher']
+        dateSend = raw['datetime']
+        pencatatan(str(msg), dateSend)
+        dec = cipher.decrypt(msg)
+        print("Decrypted\t: ", dec)
 
-
-client.loop_start()        #start the loop
-  
-while Connected != True:    #Wait for connection
-    time.sleep(0.1)
-client.subscribe("percobaan/data")
-try:
-    while True:
-        time.sleep(100)
-except KeyboardInterrupt:
-    print ("exiting")
-    client.disconnect()
-    client.loop_stop()
+client.loop_start()
+client.subscribe("percobaan/data", qos=1)
+client.on_message = on_message
+time.sleep(300)
+client.loop_stop
