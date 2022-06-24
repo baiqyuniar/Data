@@ -19,7 +19,7 @@ def on_message(client, userdata, msg):
     pencatatan(str(msg), timeSend)
     print("Subscribed : ", msg)
     
-client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
+client = paho.Client(client_id="clientId-7GWFTtedw0", userdata=None, protocol=paho.MQTTv5)
 client.on_connect = on_connect
 
 client.username_pw_set("dw41y6", "rtX67vv09")
