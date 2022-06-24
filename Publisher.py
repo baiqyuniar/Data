@@ -6,8 +6,6 @@ import paho.mqtt.client as paho
 from datetime import datetime
 import json
 
-from TanpaEncPub import on_publish
-
 
 class SimonCipher(object):
     """Simon Block Cipher Object"""
@@ -238,13 +236,10 @@ def on_connect(client, userdata, flags, rc, properties=None):
             message['cipher'] = simon                   # Memasukan value simon ke dalam key cipher
             message['datetime'] = now 
             stringify = json.dumps(message, indent=2) 
-            client.publish("percobaan/data", payload=stringify, qos=1)
+            client.publish("Algoritma/simon", payload=stringify, qos=1)
             print("Plaintext\t: ", mess)
             print("Just published a message to topic percobaan at "+ now) 
             sleep(1)
-
-        
-                  
 
 # MQTT Initialization
 mqttBroker = "broker.mqttdashboard.com"
@@ -252,9 +247,7 @@ client = paho.Client(client_id="clientId-7GWFTtedw0", userdata=None, protocol=pa
 client.username_pw_set("dw41y6", "rtX67vv09")
 client.connect(mqttBroker, 1883)
 
-client.on_publish = on_publish
 client.on_connect = on_connect
-
 
 client.loop_start()
 sleep(5)

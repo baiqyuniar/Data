@@ -8,15 +8,11 @@ from paho import mqtt
 def on_connect(client, userdata, flags, rc, properties=None):
     print("CONNACK received with code %s." % rc)
 
-def on_subscribe(client, userdata, mid, granted_qos, properties=None):
-    print("Subscribed: " + str(mid) + " " + str(granted_qos))
-
 client = paho.Client(client_id="clientId-7GWFTtedw0", userdata=None, protocol=paho.MQTTv5)
 client.username_pw_set("dw41y6", "rtX67vv09")
 client.connect("broker.mqttdashboard.com", 1883)
 
 client.on_connect = on_connect
-client.on_subscribe = on_subscribe
 
 class SimonCipher(object):
     """Simon Block Cipher Object"""
@@ -231,20 +227,20 @@ def pencatatan(msg, dateSend):
 	f = open('subscribe_Simon.csv', 'a')
 	f.write(msg + ";" + now + ";" + dateSend + "\n")
 
-if __name__ == "__main__":
-    key = 0x1f1e1d1c1b1a19181716151413121110
-    cipher = SimonCipher(key, 128, 128, 'ECB')
-    # print message, useful for checking if it was successful
-    def on_message(client, userdata, message):
-        raw = json.loads(message.payload.decode("utf-8"))
-        msg = raw['cipher']
-        dateSend = raw['datetime']
-        pencatatan(str(msg), dateSend)
-        dec = cipher.decrypt(msg)
-        print("Decrypted\t: ", dec)
+
+key = 0x1f1e1d1c1b1a19181716151413121110
+cipher = SimonCipher(key, 128, 128, 'ECB')
+    
+def on_message(client, userdata, message):
+    raw = json.loads(message.payload.decode("utf-8"))
+    msg = raw['cipher']
+    dateSend = raw['datetime']
+    pencatatan(str(msg), dateSend)
+    dec = cipher.decrypt(msg)
+    print("Decrypted\t: ", dec)
 
 client.loop_start()
-client.subscribe("percobaan/data", qos=1)
+client.subscribe("Algoritma/simon", qos=1)
 client.on_message = on_message
 time.sleep(300)
 client.loop_stop

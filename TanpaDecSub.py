@@ -10,12 +10,13 @@ def on_connect(client, userdata, flags, rc, properties=None):
 def pencatatan(msg, timeSend):
 	now = str(datetime.now().microsecond)
 	f = open('Subscriber.csv', 'a')
-	f.write(msg + ";" + now + ";" + dateSend + "\n")
+	f.write(msg + ";" + now + ";" + timeSend + "\n")
 
 def on_message(client, userdata, msg):
     payload = json.loads(msg.payload.decode("utf-8"))
     msg = payload['plaintext']
     timeSend = payload['datetime']
+    pencatatan(str(msg), timeSend)
     print("Subscribed : ", msg)
     
 client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
