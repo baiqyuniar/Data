@@ -7,23 +7,22 @@ from paho import mqtt
 
 def pencatatan(i, waktu, mess):
    f = open('Publisher.csv', 'a')
-   f.write("Message ke-" + i + ";" + str(mess) + ";" + waktu + "\n")
+   f.write( "Message ke-" +i+ ";" + str(mess) + ";" + waktu + "\n")
 
 message = {}
 def on_connect(client, userdata, flags, rc, properties=None):
-    print("CONNACK received with code %s." % rc)
-    if("%s", rc == "Success"):
-            for i in range (1000) : 
-                mess = randint (1000,9999)
-                now = str(datetime.now().timestamp())
+    for i in range (1000) :
+        print("CONNACK received with code %s." % rc)
+        if("%s", rc == "Success"): 
+            mess = randint (1000,9999)
+            now = str(datetime.now().timestamp())
 
-                pencatatan(str(i), now, mess)
-                message['i'] = i
-                message['plaintext'] = mess
-                message['datetime'] = now
-                payload = json.dumps(message, indent=2) 
-                client.publish("percobaan/data", payload=payload, qos=1)
-                print("Published : ", mess)
+            pencatatan(str(i), now, mess)
+            message['plaintext'] = mess
+            message['datetime'] = now
+            payload = json.dumps(message, indent=2) 
+            client.publish("percobaan/data", payload=payload, qos=1)
+            print("Published : ", mess)
             
 client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
 client.on_connect = on_connect
