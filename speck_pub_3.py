@@ -1,13 +1,13 @@
 from datetime import datetime
-import json
 from random import randint
 import time
 import paho.mqtt.client as paho
 from paho import mqtt
+from speck import SpeckCipher
 
-def dump_pub(waktu, mess):
-   f = open('Publisher TLS.csv', 'a')
-   f.write(str(mess) + ";" + waktu + "\n")
+def dump_pub(waktu, mess, messc):
+   f = open('Publisher Speck.csv', 'a')
+   f.write(str(mess) + ";" + str(messc) + ";" + waktu + "\n")
 
 def on_connect(client, userdata, flags, rc, properties=None):
     print("CONNACK received with code %s." % rc)
@@ -15,16 +15,20 @@ def on_connect(client, userdata, flags, rc, properties=None):
 client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
 client.on_connect = on_connect
 
-client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
-client.username_pw_set("rinii", "Kediri28")
-client.connect("92dd0db1a8e54522903c9bd581917a5f.s1.eu.hivemq.cloud", 8883)
+client.username_pw_set("dw41y6", "rtX67vv09")
+client.connect("broker.mqttdashboard.com", 1883)
 
-        # plaintex = 4 byte -> payload = 20 bytes
-b = 14  # plaintex = 14 byte -> payload = 30 bytes
-        # plaintex = 24 byte -> payload = 40 bytes
-    
-message = {}
-for i in range (20) : 
+            # plaintex = 4 byte -> payload = 20 bytes
+b = 24      # plaintex = 14 byte -> payload = 30 bytes
+            # plaintex = 24 byte -> payload = 40 bytes
+
+key128 = 0x1f1e1d1c1b1a19181716151413121110
+key192 = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
+key256 = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
+
+cipher = SpeckCipher(key256, 256, 128, 'ECB')
+
+for i in range (10) :
     mess = "0"
     if b == 4:
         pl = randint (1000,9999)
@@ -47,15 +51,22 @@ for i in range (20) :
         mess = mess + str(pl)
         pl = randint (1000,9999)
         mess = mess + str(pl)
-    
+
     now = "{:.5f}".format(time.time())
     now = now[5:]
-    
-    payload = "p:"+mess+";"+"t:"+now 
+
+    pt = int(mess)
+    messc = cipher.encrypt(pt)
+    payload = "p:"+str(messc)+";"+"t:"+now 
+
     client.publish("test/1", payload=payload, qos=1)
-    print("Published : ", payload)
-    dump_pub(now, mess)
+    print("Published > ", payload)
+
+    dump_pub(now, mess, messc)
+
     print(len(payload))
+
     time.sleep(2)
             
 client.disconnect()
+
