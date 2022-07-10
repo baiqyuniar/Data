@@ -13,12 +13,12 @@ client.username_pw_set("rinii", "Kediri28")
 client.connect("92dd0db1a8e54522903c9bd581917a5f.s1.eu.hivemq.cloud", 8883)
 
         # plaintex = 4 byte -> payload = 20 bytes
-b = 14  # plaintex = 14 byte -> payload = 30 bytes
+b = 24   # plaintex = 14 byte -> payload = 30 bytes
         # plaintex = 24 byte -> payload = 40 bytes
 
 def dump_sub(msg, timeSend):
 	#now = str(datetime.now().timestamp())
-	now = "{:.5f}".format(time.time())
+	now = "{:.5f}".format(time.time_ns())
 	now = now[5:]
 	f = open('Subscriber TLS.csv', 'a')
 	f.write(msg + ";" + now + ";" + timeSend + "\n")
@@ -35,6 +35,6 @@ def on_message(client, userdata, msg):
     
 
 client.on_message = on_message
-client.subscribe("test/1", qos=1)
+client.subscribe("top/123", qos=1)
 
 client.loop_forever()

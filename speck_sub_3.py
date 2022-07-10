@@ -14,19 +14,19 @@ client.username_pw_set("dw41y6", "rtX67vv09")
 client.connect("broker.mqttdashboard.com", 1883)
 
         # plaintex = 4 byte -> payload = 20 bytes
-b = 14  # plaintex = 14 byte -> payload = 30 bytes
+b = 24  # plaintex = 14 byte -> payload = 30 bytes
         # plaintex = 24 byte -> payload = 40 bytes
 
 key128 = 0x1f1e1d1c1b1a19181716151413121110
 key192 = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a0908
 key256 = 0x1f1e1d1c1b1a191817161514131211100f0e0d0c0b0a09080706050403020100
 
-cipher = SpeckCipher(key256, 256, 128, 'ECB')
+cipher = SpeckCipher(key128, 128, 128, 'ECB')
 
 def dump_sub(msg, timeSend):
-	now = "{:.5f}".format(time.time())
+	now = "{:.5f}".format(time.time_ns())
 	now = now[5:]
-	f = open('Subscriber Speck.csv', 'a')
+	f = open('Subscriber Speck 128.csv', 'a')
 	f.write(msg + ";" + now + ";" + timeSend + "\n")
 
 def on_message(client, userdata, msg):
@@ -42,6 +42,6 @@ def on_message(client, userdata, msg):
     print("Subscribed > ", msg)
     
 client.on_message = on_message
-client.subscribe("test/1", qos=1)
+client.subscribe("top/123", qos=1)
 
 client.loop_forever()
